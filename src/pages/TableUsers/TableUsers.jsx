@@ -1,6 +1,8 @@
 import { Table } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BackButton } from "../../components/BackButton/BackButton";
+import { Spinner } from "../../components/Spinner/Spinner";
 
 function handleErrors(response) {
   if (!response.ok) {
@@ -16,28 +18,53 @@ export const TableUsers = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // useEffect(() => {
+  //   setIsLoading(true);
+  //   fetch("https://jsonplaceholder.typicode.com/users/")
+  //     .then(handleErrors)
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       setUser(data);
+  //     })
+  //     .catch(() => {
+  //       setErrorMessage("No data");
+  //     })
+  //     .finally(() => setIsLoading(false));
+  // }, []);
+
   useEffect(() => {
-    setIsLoading(true);
-    fetch("https://jsonplaceholder.typicode.com/users/")
-      .then(handleErrors)
-      .then((response) => response.json())
-      .then((data) => {
+    async function fetchData() {
+      setIsLoading(true);
+      try {
+        const response = await fetch(
+          `https://jsonplaceholder.typicode.com/users/`
+        );
+        handleErrors(response);
+        const data = await response.json();
         setUser(data);
-      })
-      .catch(() => {
+      } catch (error) {
         setErrorMessage("No data");
-      })
-      .finally(() => setIsLoading(false));
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
   }, []);
 
   if (errorMessage) {
     return <Error errorMessage={errorMessage} />;
   }
 
+  if (isLoading) {
+    return <Spinner />;
+  }
+
   // const rows
 
   return (
     <>
+      <BackButton />
       <h1>Table Users</h1>
       <Table withBorder withColumnBorders striped>
         <thead>
