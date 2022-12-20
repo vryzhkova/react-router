@@ -3,53 +3,29 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "../../components/BackButton/BackButton";
 import { Spinner } from "../../components/Spinner/Spinner";
-
-function handleErrors(response) {
-  if (!response.ok) {
-    throw Error(response.statusText);
-  }
-  return response;
-}
+import axios from "axios";
 
 export const TableUsers = () => {
   const navigate = useNavigate();
-
   const [users, setUser] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   fetch("https://jsonplaceholder.typicode.com/users/")
-  //     .then(handleErrors)
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       setUser(data);
-  //     })
-  //     .catch(() => {
-  //       setErrorMessage("No data");
-  //     })
-  //     .finally(() => setIsLoading(false));
-  // }, []);
-
   useEffect(() => {
-    async function fetchData() {
+    async function getUser() {
       setIsLoading(true);
       try {
-        const response = await fetch(
-          `https://jsonplaceholder.typicode.com/users/`
+        const response = await axios.get(
+          "https://jsonplaceholder.typicode.com/users/"
         );
-        handleErrors(response);
-        const data = await response.json();
-        setUser(data);
+        setUser(response.data);
       } catch (error) {
         setErrorMessage("No data");
       } finally {
         setIsLoading(false);
       }
     }
-
-    fetchData();
+    getUser();
   }, []);
 
   if (errorMessage) {
@@ -59,8 +35,6 @@ export const TableUsers = () => {
   if (isLoading) {
     return <Spinner />;
   }
-
-  // const rows
 
   return (
     <>
